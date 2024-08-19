@@ -1,5 +1,6 @@
-from data.data_loader import load_data
+# pages/page1.py
+import streamlit as st
 
-def render():
-    data = load_data()
-    st.write(data)
+def show_page():
+    st.title("Page 1")
+    st.write("This is the content of Page 1.")

@@ -1,14 +1,19 @@
 import streamlit as st
-from pages import page1, page2, page3
+from pages import page1, page2, page3, page4
 
-# タブの作成
-tab1, tab2, tab3 = st.tabs(["Tab 1", "Tab 2", "Tab 3"])
+PAGES = {
+    "Page 1": page1,
+    "Page 2": page2,
+    "Page 3": page3,
+    "Page 4": page4
+}
 
-with tab1:
-    page1.render()
+def main():
+    st.sidebar.title("Navigation")
+    selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
-with tab2:
-    page2.render()
+    page = PAGES[selection]
+    page.show_page()
 
-with tab3:
-    page3.render()
+if __name__ == "__main__":
+    main()
