@@ -1,5 +1,14 @@
 import streamlit as st
-from pages import page1, page2, page3, page4
+from app_pages import page1, page2, page3, page4
+
+st.set_page_config(
+    page_title="ホーム",  # ブラウザタブに表示されるタイトル
+    page_icon="🏠",     # オプション: ページアイコン（emojiや文字列）
+    layout="wide",      # オプション: レイアウト ("centered" または "wide")
+    initial_sidebar_state="expanded"  # サイドバーの初期状態 ("expanded" または "collapsed")
+)
+
+st.title("ホーム")
 
 PAGES = {
     "Page 1": page1,
