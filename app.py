@@ -8,7 +8,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"  # サイドバーの初期状態 ("expanded" または "collapsed")
 )
 
-st.title("ホーム")
+
 
 PAGES = {
     "Page 1": page1,
