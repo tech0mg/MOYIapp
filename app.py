@@ -1,5 +1,5 @@
 import streamlit as st
-from app_pages import page1, page2, page3, page4
+from app_pages import page1, page2, page3, page4,page5
 
 st.set_page_config(
     page_title="ホーム",  # ブラウザタブに表示されるタイトル
@@ -8,17 +8,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"  # サイドバーの初期状態 ("expanded" または "collapsed")
 )
 
-
-
 PAGES = {
-    "Page 1": page1,
-    "Page 2": page2,
-    "Page 3": page3,
-    "Page 4": page4
+    "旅行計画登録": page1,
+    "旅行計画表": page2,
+    "目的地設定": page3,
+    "メンバー登録": page4,
+    "旅行先提案": page5
 }
 
 def main():
-    st.sidebar.title("Navigation")
+    st.sidebar.title("機能一覧")
     selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 
     page = PAGES[selection]
