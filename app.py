@@ -1,5 +1,5 @@
 import streamlit as st
-from app_pages import page1, page2, page3, page4,page5
+from app_pages import page1, page2, page3, page4, page5
 
 st.set_page_config(
     page_title="ホーム",  # ブラウザタブに表示されるタイトル
