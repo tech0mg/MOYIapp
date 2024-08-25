@@ -15,10 +15,10 @@ def save_to_csv(travel_name):
         df = pd.read_csv(CSV_FILE_PATH)
     else:
         # 新しいデータフレームを作成
-        df = pd.DataFrame(columns=["旅行名"])
+        df = pd.DataFrame(columns=["plan_name"])
     
     # 新しい旅行名をデータフレームに追加
-    new_entry = pd.DataFrame({"旅行名": [travel_name]})
+    new_entry = pd.DataFrame({"plan_name": [travel_name]})
     df = pd.concat([df, new_entry], ignore_index=True)
     
     # データをCSVに保存

@@ -53,9 +53,7 @@ def show_page():
     
     # CSVを作成する
     def save_response_to_csv(response, filename="travel_suggestions.csv"):
-        # DataFrameを作成
         df = pd.DataFrame([{"response": response}])
-        # CSVファイルに保存
         df.to_csv(filename, index=False)
         print(f"Response saved to {filename}")
     
