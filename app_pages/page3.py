@@ -5,12 +5,10 @@ import time
 import os
 
 def show_page():
-    RAKUTEN_APPLICATION_ID = os.getenv('RAKUTEN_APPLICATION_ID')
-    RAKUTEN_AFFILIATE_ID =  os.getenv('RAKUTEN_AFFILIATE_ID')
-    # CSV保存先のパス
-    SAVE_PATH = os.path.join(os.path.expanduser("~"), "Desktop", "MOYI_test", "selected_hotels.csv")
+    RAKUTEN_APPLICATION_ID = os.getenv("RAKUTEN_APPLICATION_ID")
+    RAKUTEN_AFFILIATE_ID = os.getenv("RAKUTEN_AFFILIATE_ID")
+    SAVE_PATH = "selected_hotels.csv"
 
-    # 地区コードを取得する関数
     def get_area_codes():
         url = "https://app.rakuten.co.jp/services/api/Travel/GetAreaClass/20131024"
         params = {
@@ -49,7 +47,6 @@ def show_page():
             st.error(f"地区コードの取得に失敗しました: {e}")
             return {}
 
-    # ホテル情報を取得する関数
     def get_hotels(area_code, min_price, max_price):
         url = "https://app.rakuten.co.jp/services/api/Travel/SimpleHotelSearch/20170426"
         params = {
@@ -94,63 +91,74 @@ def show_page():
             st.error(f"ホテル情報の取得に失敗しました: {e}")
             return []
 
-    # 選択されたホテル情報をCSVに保存する関数
-    def save_hotel_to_csv(hotel_info):
-        directory = os.path.dirname(SAVE_PATH)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    def save_hotel_to_csv(hotels, filename=SAVE_PATH):
+        df_hotel = pd.DataFrame(hotels)
+        df_hotel.drop_duplicates(subset='name', inplace=True)
+        df_hotel.to_csv(filename, index=False)
 
-        df = pd.DataFrame([hotel_info])
-        df.to_csv(SAVE_PATH, mode="a", header=not os.path.exists(SAVE_PATH), index=False, encoding="utf-8-sig")
-        st.success(f"ホテル情報をCSVに保存しました: {hotel_info['name']} (保存先: {SAVE_PATH})")
+    # 初期化: セッション状態のチェック
+    if 'output_hotel' not in st.session_state:
+        st.session_state['output_hotel'] = []
 
-# Streamlitアプリケーション
-    try:
-        st.title("目的地と予算から宿を選択しましょう")
+    if 'selected_hotels' not in st.session_state:
+        st.session_state['selected_hotels'] = []
 
-        # 地区コードを取得
-        area_codes = get_area_codes()
+    st.title("目的地と予算から宿を選択しましょう")
 
-        if not area_codes:
-            st.error("地区情報の取得に失敗しました。しばらくしてから再試行してください。")
-            return
+    area_codes = get_area_codes()
 
-        # 目的地選択
-        selected_area = st.selectbox("目的地を選択してください", list(area_codes.keys()))
+    if not area_codes:
+        st.error("地区情報の取得に失敗しました。しばらくしてから再試行してください。")
+        return
 
-        # 予算範囲選択
-        price_range = st.select_slider(
-            "予算範囲を選択してください",
-            options=list(range(1000, 51000, 1000)),
-            value=(8000, 20000)
-        )
-        min_price, max_price = price_range
+    selected_area = st.selectbox("目的地を選択してください", list(area_codes.keys()))
 
-        if st.button("検索"):
-            with st.spinner("宿を検索中..."):
-                area_code = area_codes[selected_area]
-                hotels = get_hotels(area_code, min_price, max_price)
+    price_range = st.select_slider(
+        "予算範囲を選択してください",
+        options=list(range(1000, 51000, 1000)),
+        value=(8000, 20000)
+    )
+    min_price, max_price = price_range
 
-            if hotels:
-                st.success(f"{len(hotels)}件の宿が見つかりました。")
-                for hotel in hotels:
-                    col1, col2, col3 = st.columns([2, 4, 1])
-                    with col1:
-                        st.image(hotel["image"], width=150)
-                    with col2:
-                        st.write(f"**{hotel['name']}**")
-                        st.write(f"料金: {hotel['price']}円")
-                        st.write(f"住所: {hotel['address']}")
-                    with col3:
-                        if st.button("選択", key=hotel["name"]):
-                            save_hotel_to_csv({"name": hotel["name"], "address": hotel["address"]})
-                    st.write("---")
-            else:
-                st.warning("条件に合う宿が見つかりませんでした。別の条件で試してみてください。")
+    if st.button("検索"):
+        with st.spinner("宿を検索中..."):
+            area_code = area_codes[selected_area]
+            hotels = get_hotels(area_code, min_price, max_price)
+            st.session_state['output_hotel'] = hotels
+            st.session_state['selected_hotels'] = []
 
-        # APIリクエスト制限への対応
-        time.sleep(1)
-        
-    except Exception as e:
-        st.error(f"エラーが発生しました: {str(e)}")
-        st.exception(e)    
+        if hotels:
+            st.success(f"{len(hotels)}件の宿が見つかりました。")
+        else:
+            st.warning("条件に合う宿が見つかりませんでした。別の条件で試してみてください。")
+
+    # ホテル情報の表示とチェックボックスによる選択
+    if st.session_state['output_hotel']:
+        for hotel in st.session_state['output_hotel']:
+            col1, col2, col3 = st.columns([2, 4, 1])
+            with col1:
+                st.image(hotel["image"], width=150)
+            with col2:
+                st.write(f"**{hotel['name']}**")
+                st.write(f"料金: {hotel['price']}円")
+                st.write(f"住所: {hotel['address']}")
+            with col3:
+                if st.checkbox("選択", key=hotel["name"]):
+                    if hotel not in st.session_state['selected_hotels']:
+                        st.session_state['selected_hotels'].append(hotel)
+                else:
+                    if hotel in st.session_state['selected_hotels']:
+                        st.session_state['selected_hotels'].remove(hotel)
+            st.write("---")
+
+    # CSVに保存するボタン
+    if st.button("CSVに保存"):
+        if st.session_state['selected_hotels']:
+            save_hotel_to_csv(st.session_state['selected_hotels'])
+            st.success("選択された宿泊施設をCSVに保存しました。")
+        else:
+            st.warning("宿泊施設が選択されていません。")
+
+    # APIリクエスト制限への対応
+    time.sleep(1)
+
