@@ -5,7 +5,8 @@ import time
 import os
 
 def show_page():
-
+    RAKUTEN_APPLICATION_ID = os.getenv('RAKUTEN_APPLICATION_ID')
+    RAKUTEN_AFFILIATE_ID =  os.getenv('RAKUTEN_AFFILIATE_ID')
     # CSV保存先のパス
     SAVE_PATH = os.path.join(os.path.expanduser("~"), "Desktop", "MOYI_test", "selected_hotels.csv")
 
