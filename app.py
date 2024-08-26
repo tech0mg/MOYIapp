@@ -3,7 +3,7 @@ from app_pages import page1, page2, page3, page4, page5
 
 st.set_page_config(
     page_title="ホーム",  # ブラウザタブに表示されるタイトル
-    page_icon="🏠",     # オプション: ページアイコン（emojiや文字列）
+    page_icon="🛫",     # オプション: ページアイコン（emojiや文字列）
     layout="wide",      # オプション: レイアウト ("centered" または "wide")
     initial_sidebar_state="expanded"  # サイドバーの初期状態 ("expanded" または "collapsed")
 )
@@ -16,8 +16,8 @@ PAGES = {
 }
 
 def main():
-    st.sidebar.title("機能一覧")
-    selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+    st.sidebar.title("MOYI App")
+    selection = st.sidebar.radio("機能一覧", list(PAGES.keys()))
 
     page = PAGES[selection]
     page.show_page()
